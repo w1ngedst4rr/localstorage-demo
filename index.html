@@ -2,137 +2,182 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Learning localStorage</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bulma CSS (local) -->
-    <link rel="stylesheet" href="vendor/bulma.min.css">
-    <style>
-        body.light-theme {
-            background-color: #f5f5f5;
-            color: #363636;
-        }
+  <meta charset="UTF-8">
+  <title>Learning localStorage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        body.dark-theme {
-            background-color: #363636;
-            color: #f5f5f5;
-        }
-    </style>
+  <link rel="stylesheet" href="vendor/bulma.min.css">
+
+  <style>
+    body.light-theme {
+      background-color: #f5f5f5;
+      color: #363636;
+    }
+
+    body.dark-theme {
+      background-color: #363636;
+      color: #f5f5f5;
+    }
+  </style>
 </head>
 
-<body>
+<body class="light-theme">
 
-    <!-- Hero section -->
-    <section class="hero is-primary">
-        <div class="hero-body">
-            <p class="title">localStorage Demo</p>
-            <p class="subtitle">Grade 9 Web Development</p>
+  <section class="hero is-primary">
+    <div class="hero-body">
+      <p class="title">localStorage Demo</p>
+      <p class="subtitle">Grade 9 Web Development</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <h2 class="title is-4">Try it yourself!</h2>
+
+      <div class="field">
+        <label class="label">Your Name</label>
+        <div class="control">
+          <input id="name" class="input" type="text" placeholder="Enter your name">
         </div>
-    </section>
+      </div>
 
-    <!-- Content -->
-    <section class="section">
-        <div class="container">
-            <h2 class="title is-4">What is localStorage?</h2>
-            <p>
-                <strong>localStorage</strong> is a simple way to store key/value pairs in the browser.
-                Data is saved even after closing the tab or browser, and is scoped to the same website.
-            </p>
-            <br>
-            <h2 class="title is-4">Common Methods</h2>
-            <ul>
-                <li><code>localStorage.setItem(key, value)</code> – Save data</li>
-                <li><code>localStorage.getItem(key)</code> – Retrieve data</li>
-                <li><code>localStorage.removeItem(key)</code> – Delete one item</li>
-                <li><code>localStorage.clear()</code> – Clear all items</li>
-                <li><code>localStorage.key(index)</code> – Get key by index</li>
-            </ul>
-
-            <hr>
-
-            <!-- Demo form -->
-            <h2 class="title is-4">Try it yourself!</h2>
-            <div class="field">
-                <label class="label">Your Name</label>
-                <div class="control">
-                    <input id="name" class="input" type="text" placeholder="Enter your name">
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label">Theme</label>
-                <div class="control">
-                    <div class="select">
-                        <select id="theme">
-                            <option value="light">Light</option>
-                            <option value="dark">Dark</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="buttons">
-                <button id="save" class="button is-success">Save</button>
-                <button id="clear" class="button is-danger">Clear</button>
-            </div>
-
-            <p id="status" class="has-text-info mt-3"></p>
+      <div class="field">
+        <label class="label">Theme</label>
+        <div class="control">
+          <div class="select">
+            <select id="theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
         </div>
-    </section>
+      </div>
+
+      <div class="field">
+        <label class="label">Favorite Band / Singer</label>
+        <div class="control">
+          <input id="favoriteBand" class="input" type="text"
+                 placeholder="e.g., Itchyworms">
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="save" class="button is-success">Save</button>
+        <button id="clear" class="button is-danger">Clear</button>
+      </div>
+
+      <p id="status" class="has-text-info mt-3"></p>
+
+      <div class="box mt-4">
+        <h3 class="title is-5">Saved data</h3>
+        <pre id="dump"></pre>
+      </div>
+
+    </div>
+  </section>
 
 <script>
   function applyTheme(theme) {
-    const body = document.body;
-    body.classList.remove('light-theme', 'dark-theme');
-    if (theme === 'dark') {
-      body.classList.add('dark-theme');
-    } else {
-      body.classList.add('light-theme');
-    }
+    document.body.classList.remove("light-theme", "dark-theme");
+    document.body.classList.add(theme === "dark" ? "dark-theme" : "light-theme");
   }
 
-  // Load saved values on page load
-  document.addEventListener("DOMContentLoaded", function() {
+  function renderDump() {
+    const dump = {};
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      dump[key] = localStorage.getItem(key);
+    }
+
+    document.getElementById("dump").textContent =
+      JSON.stringify(dump, null, 2);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
     const savedName = localStorage.getItem("name");
     const savedTheme = localStorage.getItem("theme") || "light";
+    const savedFavoriteBand = localStorage.getItem("favoriteBand");
+    const savedProfile = localStorage.getItem("profile");
 
-    if (savedName) document.getElementById("name").value = savedName;
-    document.getElementById("theme").value = savedTheme;
+    if (savedProfile) {
+      const p = JSON.parse(savedProfile);
+      document.getElementById("name").value = p.name || "";
+      document.getElementById("theme").value = p.theme || "light";
+      document.getElementById("favoriteBand").value = p.favoriteBand || "";
+    } else {
+      if (savedName) document.getElementById("name").value = savedName;
+      if (savedFavoriteBand)
+        document.getElementById("favoriteBand").value = savedFavoriteBand;
+      document.getElementById("theme").value = savedTheme;
+    }
 
     applyTheme(savedTheme);
+    renderDump();
 
-    if (savedName || savedTheme) {
-      document.getElementById("status").textContent = "Loaded saved data from localStorage!";
+    if (savedName || savedFavoriteBand || savedProfile) {
+      document.getElementById("status").textContent =
+        "Loaded saved data from localStorage!";
     }
   });
 
-    // Apply theme immediately when user changes the select
-    document.getElementById("theme").addEventListener("change", function(e) {
-        const themeValue = e.target.value;
-        localStorage.setItem("theme", themeValue);
-        applyTheme(themeValue);
-        document.getElementById("status").textContent = "Theme changed.";
-    });
-
-  // Save button
-  document.getElementById("save").onclick = function() {
-    localStorage.setItem("name", document.getElementById("name").value);
-    const themeValue = document.getElementById("theme").value;
+  document.getElementById("theme").addEventListener("change", function (e) {
+    const themeValue = e.target.value;
     localStorage.setItem("theme", themeValue);
     applyTheme(themeValue);
-    document.getElementById("status").textContent = "Data saved! Reload the page to see persistence.";
+    renderDump();
+  });
+
+  document.getElementById("save").onclick = function () {
+    const nameValue = document.getElementById("name").value.trim();
+
+    if (!nameValue) {
+      document.getElementById("status").textContent =
+        "Please enter your name before saving.";
+      return;
+    }
+
+    const themeValue = document.getElementById("theme").value;
+    const favoriteBandValue =
+      document.getElementById("favoriteBand").value;
+
+    localStorage.setItem("name", nameValue);
+    localStorage.setItem("theme", themeValue);
+    localStorage.setItem("favoriteBand", favoriteBandValue);
+
+    const profile = {
+      name: nameValue,
+      theme: themeValue,
+      favoriteBand: favoriteBandValue
+    };
+
+    localStorage.setItem("profile", JSON.stringify(profile));
+
+    applyTheme(themeValue);
+    renderDump();
+
+    document.getElementById("status").textContent =
+      "Data saved! Reload to test persistence.";
   };
 
-  // Clear button
-  document.getElementById("clear").onclick = function() {
-    localStorage.clear();
+  document.getElementById("clear").onclick = function () {
+    localStorage.removeItem("name");
+    localStorage.removeItem("theme");
+    localStorage.removeItem("favoriteBand");
+    localStorage.removeItem("profile");
+
     document.getElementById("name").value = "";
     document.getElementById("theme").value = "light";
+    document.getElementById("favoriteBand").value = "";
+
     applyTheme("light");
-    document.getElementById("status").textContent = "localStorage cleared!";
+    renderDump();
+
+    document.getElementById("status").textContent =
+      "Removed selected items from localStorage.";
   };
 </script>
 
 </body>
-
 </html>
